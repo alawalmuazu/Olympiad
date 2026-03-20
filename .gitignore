@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data (large files — keep only reference.csv)
+data/*.parquet
+data/*.pdf
+data/*.zip
+
+# Local dev temp files
+*.log
+.env
+tmp/
+
+# VS Code
+.vscode/
+
+# Docs backup
+docs copy.html
