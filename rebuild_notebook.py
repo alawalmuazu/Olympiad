@@ -1,9 +1,24 @@
-{
-  "cells": [
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
+"""
+Rebuild submission.ipynb from the updated PASTE_INTO_KAGGLE.txt cells.
+Run this script to regenerate the notebook with all fixes applied.
+"""
+import json
+
+# Read the existing notebook to preserve metadata
+with open("submission.ipynb", "r", encoding="utf-8") as f:
+    nb = json.load(f)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Define all cells from the fixed PASTE_INTO_KAGGLE.txt
+# ══════════════════════════════════════════════════════════════════════════════
+
+cells = []
+
+# ── Markdown: Header ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": [
         "# AIMO Progress Prize 3 — Submission Notebook\n",
         "**3-Layer Pipeline:** SymPy Pre-Solve → GPT-OSS-120B TIR → Lean4 Verification\n",
         "\n",
@@ -14,22 +29,24 @@
         "| 3 | Lean4 gate + plausibility filter | ~10s | 0.5→1.0 pts upgrade |\n",
         "\n",
         "**Target: 47+/50** · Leaderboard leader: 46/50 · Grand Prize threshold: 47/50 ($1.59M)\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
-        "## Cell 1 — Configuration"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "id": "f9b5ee10",
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 1 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": ["## Cell 1 — Configuration"]
+})
+
+# ── Code: Cell 1 ──────────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "id": "f9b5ee10",
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "import os, sys, time, re, json, math, subprocess, textwrap\n",
         "from pathlib import Path\n",
         "import glob\n",
@@ -85,23 +102,25 @@
         "\n",
         "competition_start = time.time()\n",
         "print(f\"IS_KAGGLE={IS_KAGGLE} | Layer1={layer1_found} | {DEFAULT_PER_PROBLEM}s/problem\")\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "id": "a471a0c0",
-      "metadata": {},
-      "source": [
-        "## Cell 2 — Dependencies (Offline vllm Install)"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "id": "a0a50b69",
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 2 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "id": "a471a0c0",
+    "metadata": {},
+    "source": ["## Cell 2 — Dependencies (Offline vllm Install)"]
+})
+
+# ── Code: Cell 2 — FIXED vllm installation ────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "id": "a0a50b69",
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "# ── Offline vllm installation (internet is OFF) ──────────────────────────────\n",
         "# vllm is NOT preinstalled on Kaggle — must install from bundled wheels.\n",
         "# Attach one of these public datasets as input:\n",
@@ -183,25 +202,29 @@
         "    print(\"❌ sympy not found\")\n",
         "\n",
         "print(\"Dependency check complete\")\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "id": "19bb4394",
-      "metadata": {},
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 3 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "id": "19bb4394",
+    "metadata": {},
+    "source": [
         "## Cell 3 — Load GPT-OSS-120B via vLLM\n",
         "\n",
         "⚠️ **Must load BEFORE starting gRPC server** (15-min startup limit)"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "id": "00bfd537",
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Code: Cell 3 — FIXED GPU memory ──────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "id": "00bfd537",
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "# vllm — required on Kaggle H100, not available locally\n",
         "try:\n",
         "    from vllm import LLM, SamplingParams\n",
@@ -246,23 +269,25 @@
         "PARAMS_DETERMINISTIC = SamplingParams(temperature=0.0, max_tokens=4096, stop=[\"</s>\"])\n",
         "PARAMS_DIVERSE       = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=4096)\n",
         "print(\"Sampling params ready\")\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "id": "49f0e2a1",
-      "metadata": {},
-      "source": [
-        "## Cell 4 — Layer 2: Tool-Integrated Reasoning (TIR) Engine"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "id": "f5771bae",
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 4 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "id": "49f0e2a1",
+    "metadata": {},
+    "source": ["## Cell 4 — Layer 2: Tool-Integrated Reasoning (TIR) Engine"]
+})
+
+# ── Code: Cell 4 (unchanged) ─────────────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "id": "f5771bae",
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "import ast, traceback\n",
         "from collections import Counter\n",
         "\n",
@@ -545,21 +570,23 @@
         "    else:\n",
         "        print(f'  GVR: no answer found')\n",
         "    return best_answer\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
-        "## Cell 5 — Layer 3: Lean4 Gate + Plausibility Filter"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 5 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": ["## Cell 5 — Layer 3: Lean4 Gate + Plausibility Filter"]
+})
+
+# ── Code: Cell 5 (unchanged) ─────────────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "# ── Lean4 binary path (pre-uploaded as dataset) ───────────────────────────\n",
         "LEAN4_BIN = \"/kaggle/input/lean4-binary/lean4/bin/lean\"\n",
         "LEAN4_AVAILABLE = os.path.exists(LEAN4_BIN) if IS_KAGGLE else False\n",
@@ -621,21 +648,23 @@
         "                print(f\"  ⚠️  Answer {answer} may not satisfy mod {mod_val} constraint\")\n",
         "    _problem_answers[problem_id] = answer\n",
         "    return answer\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
-        "## Cell 6 — Main `predict()` Function"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 6 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": ["## Cell 6 — Main `predict()` Function"]
+})
+
+# ── Code: Cell 6 (unchanged) ─────────────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "import polars as pl\n",
         "\n",
         "problems_solved    = 0\n",
@@ -708,21 +737,23 @@
         "    print(f\"  Stats: {layer1_hits} Layer1 | {problems_solved}/{problems_attempted} solved\")\n",
         "\n",
         "    return pl.DataFrame({\"id\": [problem_id], \"answer\": [answer]})\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
-        "## Cell 7 — Start gRPC Server + Run Competition"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 7 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": ["## Cell 7 — Start gRPC Server + Run Competition"]
+})
+
+# ── Code: Cell 7 — FIXED gRPC server ─────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "if IS_KAGGLE:\n",
         "    # On Kaggle: MUST start the gRPC server — no try/except!\n",
         "    # If this fails, the submission gets \"Inference Server Error\"\n",
@@ -737,23 +768,27 @@
         "else:\n",
         "    print(\"LOCAL DEV: kaggle_evaluation not installed\")\n",
         "    print(\"→ Run Cell 8 (local test harness) instead\")\n"
-      ]
-    },
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
+    ]
+})
+
+# ── Markdown: Cell 8 ──────────────────────────────────────────────────────────
+cells.append({
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": [
         "## Cell 8 — Local Testing (DO NOT RUN ON KAGGLE)\n",
         "\n",
         "Run this cell locally to validate the pipeline against reference problems."
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# ── Code: Cell 8 (unchanged) ─────────────────────────────────────────────────
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "# ⚠️  Only run this cell in LOCAL DEV mode — comment out before uploading to Kaggle\n",
         "\n",
         "if not IS_KAGGLE:\n",
@@ -796,36 +831,54 @@
         "    print(f\"  Layer 1 (deterministic): ~{hit_rate*50:.0f} problems × 1.0 = {hit_rate*50:.0f} pts\")\n",
         "    print(f\"  Layer 2 TIR (stochastic): ~{(1-hit_rate)*50:.0f} problems × 0.6 avg = {(1-hit_rate)*50*0.6:.0f} pts\")\n",
         "    print(f\"  Projected total: ~{hit_rate*50 + (1-hit_rate)*50*0.6:.0f}/50\")\n"
-      ]
-    }
-  ],
-  "metadata": {
+    ]
+})
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Write the rebuilt notebook
+# ══════════════════════════════════════════════════════════════════════════════
+nb["cells"] = cells
+
+# Ensure metadata is correct
+nb["metadata"] = {
     "kaggle": {
-      "accelerator": "gpu",
-      "dataSources": [
-        {
-          "sourceId": "ai-mathematical-olympiad-progress-prize-3",
-          "sourceType": "competition"
-        },
-        {
-          "modelInstanceId": "unsloth/gpt-oss-120b",
-          "sourceId": "gpt-oss-120b",
-          "sourceType": "model"
-        }
-      ],
-      "isGpuEnabled": true,
-      "isInternetEnabled": false
+        "accelerator": "gpu",
+        "dataSources": [
+            {
+                "sourceId": "ai-mathematical-olympiad-progress-prize-3",
+                "sourceType": "competition"
+            },
+            {
+                "modelInstanceId": "unsloth/gpt-oss-120b",
+                "sourceId": "gpt-oss-120b",
+                "sourceType": "model"
+            }
+        ],
+        "isGpuEnabled": True,
+        "isInternetEnabled": False
     },
     "kernelspec": {
-      "display_name": "Python 3",
-      "language": "python",
-      "name": "python3"
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3"
     },
     "language_info": {
-      "name": "python",
-      "version": "3.10.0"
+        "name": "python",
+        "version": "3.10.0"
     }
-  },
-  "nbformat": 4,
-  "nbformat_minor": 5
 }
+
+with open("submission.ipynb", "w", encoding="utf-8") as f:
+    json.dump(nb, f, indent=2, ensure_ascii=False)
+
+print("[OK] submission.ipynb rebuilt successfully")
+print(f"   Cells: {len(cells)}")
+print("   Changes applied:")
+print("   - Cell 1: glob import + robust Layer 1 search")
+print("   - Cell 2: Offline vllm wheel installation (3 strategies)")
+print("   - Cell 3: GPU memory 0.92 -> 0.88")
+print("   - Cell 4: GVR self-verification pipeline (Aletheia-inspired)")
+print("   -          -> self_verify() + backward_verify() + gvr_solve()")
+print("   -          -> Replaces 8-sample majority vote with 3-round verified loop")
+print("   - Cell 6: predict() rewired to use gvr_solve()")
+print("   - Cell 7: IS_KAGGLE guard (no try/except swallowing gRPC errors)")

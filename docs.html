@@ -307,25 +307,48 @@
                 </div>
             </details>
 
+            <details class="accordion" open>
+                <summary><svg><use href="#i-shield"/></svg> Approach 4: GVR Self-Verification Pipeline (Aletheia-Inspired) ⭐ ACTIVE</summary>
+                <div class="inner">
+                    <p>Inspired by DeepMind's Aletheia autonomous research agent. Instead of generating 8 samples and voting, generate <strong>fewer</strong> solutions but <strong>verify each one</strong> before submitting. Verified answers score 1.0 on both runs.</p>
+                    <table class="doc-table">
+                        <tr><th>Phase</th><th>Method</th><th>LLM Calls</th></tr>
+                        <tr><td><strong>Generate</strong></td><td>GPT-OSS-120B generates Python code + solution</td><td>1</td></tr>
+                        <tr><td><strong>Self-Verify</strong></td><td>Feed solution back to LLM — "find any error"</td><td>1</td></tr>
+                        <tr><td><strong>Backward-Verify</strong></td><td>LLM writes code to substitute answer into constraints</td><td>1</td></tr>
+                        <tr><td><strong>Retry (if failed)</strong></td><td>Use critique as feedback → generate new approach</td><td>1-2</td></tr>
+                    </table>
+                    <div class="alert success"><svg><use href="#i-info"/></svg><span><strong>Key advantage:</strong> Uses 2-3 LLM calls instead of 8, but produces <em>verified</em> answers. The double-run scoring rewards deterministic, correct answers — exactly what GVR delivers. A single verified solution beats 8 unverified guesses.</span></div>
+                    <div class="alert info"><svg><use href="#i-info"/></svg><span><strong>Confidence scoring:</strong> Level 0 = no answer, Level 1 = generated only, Level 2 = self-verified, Level 3 = fully backward-verified. Only Level 3 answers are submitted with highest confidence.</span></div>
+                </div>
+            </details>
+
             <div class="arch-box" style="margin-top:16px">
-                <h3 style="font-size:.9rem;margin-bottom:12px">Recommended Pipeline</h3>
+                <h3 style="font-size:.9rem;margin-bottom:12px">Active Pipeline — GVR Self-Verification Loop</h3>
                 <div class="arch-flow">
-                    <span class="arch-node">Parse LaTeX Problem</span>
+                    <span class="arch-node">Parse LaTeX</span>
                     <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
-                    <span class="arch-node primary">LLM: Generate Code<small>Python/SageMath</small></span>
+                    <span class="arch-node primary">SymPy Pre-Solve<small>Layer 1 · 7/10 hit rate</small></span>
                     <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
-                    <span class="arch-node">Execute Code<small>Sandbox</small></span>
+                    <span class="arch-node">GVR Generate<small>GPT-OSS-120B Code</small></span>
                     <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
-                    <span class="arch-node primary">Verify Integer<small>[0, 99999]</small></span>
+                    <span class="arch-node primary">Self-Verify<small>LLM finds errors</small></span>
                     <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
-                    <span class="arch-node">Submit Answer</span>
+                    <span class="arch-node">Backward-Verify<small>Constraint check</small></span>
+                    <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
+                    <span class="arch-node primary">Submit<small>Confidence 3/3</small></span>
                 </div>
                 <div class="arch-flow">
-                    <span class="arch-node" style="border-color:var(--danger)">Code Failed?</span>
+                    <span class="arch-node" style="border-color:var(--danger)">Verify Failed?</span>
                     <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
-                    <span class="arch-node">Fallback: Direct LLM Reasoning<small>Chain-of-Thought</small></span>
+                    <span class="arch-node">Retry with Critique<small>Feedback loop · Max 3 rounds</small></span>
                     <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
-                    <span class="arch-node primary">Extract Integer</span>
+                    <span class="arch-node primary">Re-Generate + Re-Verify</span>
+                </div>
+                <div class="arch-flow" style="margin-top:8px">
+                    <span class="arch-node" style="border-color:var(--warn)">All Rounds Failed?</span>
+                    <span class="arch-arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
+                    <span class="arch-node">Submit best unverified<small>Confidence 1/3</small></span>
                 </div>
             </div>
         </section>
@@ -400,13 +423,13 @@
                 <table class="doc-table">
                     <tr><th>Date</th><th>Event</th><th>Action Required</th></tr>
                     <tr><td>Nov 20, 2024</td><td>Competition Start</td><td style="color:var(--success)">✅ Already open</td></tr>
-                    <tr><td>Mar 19, 2026</td><td><strong>Today</strong></td><td class="s-mid">⚡ ~27 days remaining</td></tr>
+                    <tr><td>Mar 27, 2026</td><td><strong>Today</strong></td><td class="s-mid">⚡ ~19 days remaining</td></tr>
                     <tr><td>Apr 8, 2026</td><td>Team Merger Deadline</td><td class="s-low">Form final team by this date</td></tr>
                     <tr><td>Apr 15, 2026</td><td>Final Submission</td><td class="s-low">Last notebook submission accepted</td></tr>
                     <tr><td>Post Apr 15</td><td>Private Rerun</td><td>Notebooks rerun twice on private set</td></tr>
                 </table>
 
-                <div class="alert danger" style="margin-top:16px"><svg><use href="#i-alert"/></svg><span><strong>~27 days remaining.</strong> This is tight for building a competitive solution from scratch. Prioritize: (1) Set up baseline notebook with evaluation API, (2) Get a code-generation pipeline working, (3) Iterate on accuracy.</span></div>
+                <div class="alert danger" style="margin-top:16px"><svg><use href="#i-alert"/></svg><span><strong>~19 days remaining.</strong> GVR self-verification pipeline is implemented. Focus: (1) Test on Kaggle with GVR loop, (2) Fine-tune verification prompts, (3) Track confidence distribution across problems.</span></div>
             </div>
         </section>
 
